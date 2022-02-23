@@ -1,0 +1,9 @@
+[submodule "cvp_nav_ros.git"]
+	path = cvp_nav_ros
+	url = git@github.com:niladut/cvp_nav_ros.git
+[submodule "cvp_gazebo_ros.git"]
+	path = cvp_gazebo_ros
+	url = git@github.com:niladut/cvp_gazebo_ros.git
+[submodule "magni_description_ros.git"]
+	path = magni_description_ros
+	url = git@github.com:niladut/magni_description_ros.git
