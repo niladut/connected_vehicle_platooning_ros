@@ -7,3 +7,6 @@
 [submodule "magni_description_ros.git"]
 	path = magni_description_ros
 	url = git@github.com:niladut/magni_description_ros.git
+[submodule "cvp_bringup_ros.git"]
+	path = cvp_bringup_ros
+	url = git@github.com:niladut/cvp_bringup_ros.git
