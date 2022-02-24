@@ -22,3 +22,6 @@
 [submodule "multimaster_fkie.git"]
 	path = multimaster_fkie
 	url = https://github.com/fkie/multimaster_fkie.git
+[submodule "platooning_ros.git"]
+	path = platooning_ros
+	url = git@github.com:niladut/platooning_ros.git
