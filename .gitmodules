@@ -10,3 +10,9 @@
 [submodule "cvp_bringup_ros.git"]
 	path = cvp_bringup_ros
 	url = git@github.com:niladut/cvp_bringup_ros.git
+[submodule "imu_ros.git"]
+	path = imu_ros
+	url = git@github.com:niladut/imu_ros.git
+[submodule "imu_calib"]
+	path = imu_calib
+	url = https://github.com/dpkoch/imu_calib.git
