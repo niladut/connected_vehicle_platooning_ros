@@ -16,3 +16,9 @@
 [submodule "imu_calib"]
 	path = imu_calib
 	url = https://github.com/dpkoch/imu_calib.git
+[submodule "magni_robot.git"]
+	path = magni_robot
+	url = https://github.com/UbiquityRobotics/magni_robot.git
+[submodule "multimaster_fkie.git"]
+	path = multimaster_fkie
+	url = https://github.com/fkie/multimaster_fkie.git
