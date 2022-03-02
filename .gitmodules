@@ -25,3 +25,9 @@
 [submodule "platooning_ros.git"]
 	path = platooning_ros
 	url = git@github.com:niladut/platooning_ros.git
+[submodule "sonar_detector.git"]
+	path = sonar_detector
+	url = https://github.com/UbiquityRobotics/sonar_detector.git
+[submodule "pi_sonar.git"]
+	path = pi_sonar
+	url = https://github.com/UbiquityRobotics/pi_sonar.git
