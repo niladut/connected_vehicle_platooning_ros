@@ -31,3 +31,6 @@
 [submodule "pi_sonar.git"]
 	path = pi_sonar
 	url = https://github.com/UbiquityRobotics/pi_sonar.git
+[submodule "ubiquity_motor.git"]
+	path = ubiquity_motor
+	url = https://github.com/UbiquityRobotics/ubiquity_motor.git
