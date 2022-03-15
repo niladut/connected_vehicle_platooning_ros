@@ -34,3 +34,6 @@
 [submodule "ubiquity_motor.git"]
 	path = ubiquity_motor
 	url = https://github.com/UbiquityRobotics/ubiquity_motor.git
+[submodule "cvp_control_center_ros"]
+	path = cvp_control_center_ros
+	url = git@github.com:niladut/cvp_control_center_ros.git
