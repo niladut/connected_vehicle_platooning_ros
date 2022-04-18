@@ -37,3 +37,9 @@
 [submodule "cvp_control_center_ros"]
 	path = cvp_control_center_ros
 	url = git@github.com:niladut/cvp_control_center_ros.git
+[submodule "fiducials.git"]
+	path = fiducials
+	url = https://github.com/UbiquityRobotics/fiducials.git
+[submodule "cvp_visualization_ros.git"]
+	path = cvp_visualization_ros
+	url = git@github.com:niladut/cvp_visualization_ros.git
