@@ -43,3 +43,6 @@
 [submodule "cvp_visualization_ros.git"]
 	path = cvp_visualization_ros
 	url = git@github.com:niladut/cvp_visualization_ros.git
+[submodule "raspicam_node"]
+	path = raspicam_node
+	url = https://github.com/UbiquityRobotics/raspicam_node.git
