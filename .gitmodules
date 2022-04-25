@@ -46,3 +46,9 @@
 [submodule "raspicam_node"]
 	path = raspicam_node
 	url = https://github.com/UbiquityRobotics/raspicam_node.git
+[submodule "ir_state_detector_ros"]
+	path = ir_state_detector_ros
+	url = git@github.com:niladut/ir_state_detector_ros.git
+[submodule "line_follower_ros"]
+	path = line_follower_ros
+	url = git@github.com:niladut/line_follower_ros.git
