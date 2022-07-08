@@ -52,3 +52,6 @@
 [submodule "line_follower_ros"]
 	path = line_follower_ros
 	url = git@github.com:niladut/line_follower_ros.git
+[submodule "misc/robot_localization"]
+	path = misc/robot_localization
+	url = https://github.com/cra-ros-pkg/robot_localization.git
