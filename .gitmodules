@@ -55,3 +55,9 @@
 [submodule "misc/robot_localization"]
 	path = misc/robot_localization
 	url = https://github.com/cra-ros-pkg/robot_localization.git
+[submodule "misc/rf2o_laser_odometry"]
+	path = misc/rf2o_laser_odometry
+	url = https://github.com/tianb03/rf2o_laser_odometry.git
+[submodule "misc/rplidar_ros"]
+	path = misc/rplidar_ros
+	url = https://github.com/sharp-rmf/rplidar_ros
