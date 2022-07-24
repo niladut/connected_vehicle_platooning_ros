@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <include file="$(find morpheus_chair_pkg)/launch/motor_driver_start.launch"/>
+    <include file="$(find morpheus_chair_pkg)/launch/camera_bringup.launch"/>
+</launch>

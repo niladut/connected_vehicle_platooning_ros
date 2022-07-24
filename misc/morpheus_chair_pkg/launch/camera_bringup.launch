@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <group ns="morpheus_bot">
+        <include file="$(find raspicam_node)/launch/camera_module_v2_640x480_30fps.launch"/>
+        <!-- We call the service to start the camera publication -->
+        <node name="start_camera_service"
+            pkg="morpheus_chair_pkg"
+            type="start_camera_service.py"
+            respawn="false" output="screen">
+        </node>
+    </group>
+</launch>

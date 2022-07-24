@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+        <node name="cam_image_test_start"
+            pkg="morpheus_chair_pkg"
+            type="cam_image_tester.py"
+            respawn="false" output="screen" args="">
+        </node>
+</launch>
