@@ -61,3 +61,6 @@
 [submodule "misc/rplidar_ros"]
 	path = misc/rplidar_ros
 	url = https://github.com/sharp-rmf/rplidar_ros
+[submodule "misc/morpheus_chair"]
+	path = misc/morpheus_chair
+	url = https://bitbucket.org/theconstructcore/morpheus_chair.git
