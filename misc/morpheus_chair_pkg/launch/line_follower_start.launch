@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 
-        <arg name="R" default="150" />
-        <arg name="G" default="160" />
-        <arg name="B" default="174" />
-        <arg name="colour_error" default="10.0" />
+        <arg name="R" default="30" />
+        <arg name="G" default="30" />
+        <arg name="B" default="30" />
+        <arg name="colour_error" default="50.0" />
         <!-- mode if its different from colour_cal, it will start following line ( line_follow )-->
         <arg name="mode" default="follow_line" />
 
@@ -12,5 +12,6 @@
             pkg="morpheus_chair_pkg"
             type="line_follower.py"
             respawn="false" output="screen" args="$(arg R) $(arg G) $(arg B) $(arg colour_error) $(arg mode)">
+            <remap from="/morpheus_bot/raspicam_node/image_raw" to="/magni03/raspicam_node/image/compressed" />
         </node>
 </launch>

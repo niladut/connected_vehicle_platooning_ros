@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from cv_bridge import CvBridge, CvBridgeError
 from geometry_msgs.msg import Twist
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from rgb_hsv import BGR_HSV
 
 
@@ -27,7 +27,8 @@ class LineFollower(object):
         self.last_turn = 0
 
         self.bridge_object = CvBridge()
-        self.image_sub = rospy.Subscriber(camera_topic, Image, self.camera_callback)
+        self.image_sub = rospy.Subscriber(camera_topic, CompressedImage, self.camera_callback)
+        #self.image_sub = rospy.Subscriber(camera_topic, Image, self.camera_callback)
         self.cmd_vel_pub = rospy.Publisher(cmd_vel_topic, Twist, queue_size=1)
 
     def camera_callback(self, data):
@@ -37,11 +38,14 @@ class LineFollower(object):
 
         if self.process_this_frame:
             # We reset the counter
-            #print("Process Frame, Dropped frame to==" + str(self.droped_frames))
+            print("Process Frame, Dropped frame to==" + str(self.droped_frames))
             self.droped_frames = 0
             try:
                 # We select bgr8 because its the OpenCV encoding by default
-                cv_image = self.bridge_object.imgmsg_to_cv2(data, desired_encoding="bgr8")
+                #### direct conversion to CV2 ####
+                np_arr = np.fromstring(data.data, np.uint8)
+                cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+                #cv_image = self.bridge_object.imgmsg_to_cv2(data, desired_encoding="bgr8")
             except CvBridgeError as e:
                 print(e)
                 cv_image = None
@@ -63,8 +67,15 @@ class LineFollower(object):
 
                 min_hsv = self.hsv * (1.0-(self._colour_error / 100.0))
                 max_hsv = self.hsv * (1.0 + (self._colour_error / 100.0))
-                lower_yellow = np.array(min_hsv)
+
+                min_hsv = [0,0,0]
+                #max_hsv = [350,55,100]
+                max_hsv = [180,255,40]
+                lower_yellow = np.array([min_hsv])
                 upper_yellow = np.array(max_hsv)
+
+                print("min_hsv: "+str(min_hsv))
+                print("max_hsv: "+str(max_hsv))
 
                 # Threshold the HSV image to get only yellow colors
                 mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
@@ -107,9 +118,13 @@ class LineFollower(object):
                 if self._colour_cal:
                     cv2.imshow("Original", small_frame)
                     cv2.waitKey(1)
-                else:
-                    cv2.imshow("RES", res)
-                    cv2.waitKey(1)
+                #else:
+                    #cv2.imshow("HSV", hsv)
+                    #cv2.waitKey(1)
+                    #cv2.imshow("MASK", mask)
+                    #cv2.waitKey(1)
+                    #cv2.imshow("RES", res)
+                    #cv2.waitKey(1)
 
                 # We send data from the first cetroid we get
                 if len(centroids_detected) > 0:
@@ -125,7 +140,7 @@ class LineFollower(object):
 
         else:
             self.droped_frames += 1
-            #print("Droped Frames==" + str(self.droped_frames))
+            print("Droped Frames==" + str(self.droped_frames))
             
             
             
@@ -183,7 +198,7 @@ class LineFollower(object):
 
 
 
-            #print("NO CENTROID DETECTED...SEARCHING...")
+            print("NO CENTROID DETECTED...SEARCHING...")
 
 
         if cmd_vel.linear.x > 0:
@@ -215,7 +230,7 @@ class LineFollower(object):
         cmd_vel.linear.x = 0.0
         cmd_vel.angular.z = 0.0
         self.cmd_vel_pub.publish(cmd_vel)
-        #print("Movement Finished...")
+        print("Movement Finished...")
 
     def loop(self):
         rospy.spin()
