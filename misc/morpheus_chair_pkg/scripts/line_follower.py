@@ -45,6 +45,7 @@ class LineFollower(object):
                 #### direct conversion to CV2 ####
                 np_arr = np.fromstring(data.data, np.uint8)
                 cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+                cv_image = cv2.rotate(cv_image, cv2.ROTATE_180)
                 #cv_image = self.bridge_object.imgmsg_to_cv2(data, desired_encoding="bgr8")
             except CvBridgeError as e:
                 print(e)
@@ -70,7 +71,7 @@ class LineFollower(object):
 
                 min_hsv = [0,0,0]
                 #max_hsv = [350,55,100]
-                max_hsv = [180,255,40]
+                max_hsv = [180,255,70]
                 lower_yellow = np.array([min_hsv])
                 upper_yellow = np.array(max_hsv)
 
@@ -93,12 +94,13 @@ class LineFollower(object):
                 rospy.logdebug("Number of centroids==>" + str(len(contours)))
                 centres = []
                 for i in range(len(contours)):
-                    moments = cv2.moments(contours[i])
-                    try:
-                        centres.append((int(moments['m10'] / moments['m00']), int(moments['m01'] / moments['m00'])))
-                        cv2.circle(res, centres[-1], 10, (0, 255, 0), -1)
-                    except ZeroDivisionError:
-                        pass
+                    if cv2.contourArea(contours[i]) > 100:
+                        moments = cv2.moments(contours[i])
+                        try:
+                            centres.append((int(moments['m10'] / moments['m00']), int(moments['m01'] / moments['m00'])))
+                            cv2.circle(res, centres[-1], 10, (0, 255, 0), -1)
+                        except ZeroDivisionError:
+                            pass
 
                 rospy.logdebug(str(centres))
                 centroids_detected = []
@@ -118,13 +120,15 @@ class LineFollower(object):
                 if self._colour_cal:
                     cv2.imshow("Original", small_frame)
                     cv2.waitKey(1)
-                #else:
+                else:
+                    cv2.imshow("CropImg", crop_img)
+                    cv2.waitKey(1)
                     #cv2.imshow("HSV", hsv)
                     #cv2.waitKey(1)
-                    #cv2.imshow("MASK", mask)
-                    #cv2.waitKey(1)
-                    #cv2.imshow("RES", res)
-                    #cv2.waitKey(1)
+                    cv2.imshow("MASK", mask)
+                    cv2.waitKey(1)
+                    cv2.imshow("RES", res)
+                    cv2.waitKey(1)
 
                 # We send data from the first cetroid we get
                 if len(centroids_detected) > 0:
@@ -134,7 +138,7 @@ class LineFollower(object):
                     cx_final = None
                     cy_final = None
 
-                self.move_robot(height, width, cx_final, cy_final)
+                #self.move_robot(height, width, cx_final, cy_final)
             else:
                 pass
 
@@ -189,12 +193,12 @@ class LineFollower(object):
             
         else:
             cmd_vel.linear.x = 0.0
+            cmd_vel.angular.z = 0.0
 
-
-            if self.last_turn > 0:
-                cmd_vel.angular.z = -angular_vel_base
-            elif self.last_turn <= 0:
-                cmd_vel.angular.z = angular_vel_base
+            #if self.last_turn > 0:
+            #    cmd_vel.angular.z = -angular_vel_base
+            #elif self.last_turn <= 0:
+            #    cmd_vel.angular.z = angular_vel_base
 
 
 
@@ -232,6 +236,74 @@ class LineFollower(object):
         self.cmd_vel_pub.publish(cmd_vel)
         print("Movement Finished...")
 
+    def publish_cmd_vel(self):
+        self.update_cmd_vel()
+        #cmd_vel_msg = TwistStamped()
+        #cmd_vel_msg.header = Header(stamp=self.last_line_position_time, frame_id='line_sensor')
+        twist_msg = Twist()
+        twist_msg.linear.x = self.linear_velocity
+        twist_msg.angular.z = self.angular_velocity
+        #cmd_vel_msg.twist = twist_msg
+
+        #self._log('publish_cmd_vel cb : ' + str(self.linear_velocity) + ' , ' + str(self.angular_velocity))
+
+        self.cmd_vel_pub.publish(twist_msg)
+
+    def publish_lateral_displacement(self):
+        lateral_displacement_msg = Int8()
+        lateral_displacement_msg.data = self.line_position
+
+        #self._log('lateral_displacement cb : ' + str(self.line_position))
+
+        self.lateral_displacement_pub.publish(lateral_displacement_msg)
+
+    def update_cmd_vel(self):
+        self.pid.update(self.line_position)
+        control_value = min(abs(self.pid.output), self.max_angular_velocity)
+        self.angular_velocity = 0
+        if control_value != 0:
+            #self.angular_velocity = self.min_linear_velocity + (
+            #        self.max_angular_velocity - self.min_linear_velocity) * control_value
+            self.angular_velocity = control_value #* self.max_angular_velocity
+            self.angular_velocity = self.angular_velocity * copysign(1,self.linear_velocity) # Invert Direction if velocity is negative
+            self.angular_velocity = self.angular_velocity * self.pid.output / abs(self.pid.output)
+
+
+        #linear_coeff = 0.5  # 0.5 for better forward motion, 1 for better turning (& bumpy forward motion)
+        #self.linear_velocity = self.min_linear_velocity + (self.max_linear_velocity - self.min_linear_velocity) * (
+        #        1 - linear_coeff * control_value)
+        self._log('line position : ' + str(self.line_position) + ' , ang vel ' + str(self.angular_velocity))
+
+        #self.linear_velocity = 0
+
+    def calculate_position(self, image_dim_y, image_dim_x, cx, cy):
+        position = 0
+        if cx is not None and cy is not None:
+            origin = [image_dim_x / 2.0, image_dim_y / 2.0]
+            centroid = [cx, cy]
+            delta_left_right = centroid[0] - origin[0]
+            print("delta_left_right===>" + str(delta_left_right))
+            if delta_left_right <= image_dim_x * delta_left_percentage_not_important:
+                print("delta_left_right TO SMALL <=" + str(image_dim_x* delta_left_percentage_not_important))
+                delta_left_right = 0.0
+            delta = [delta_left_right, centroid[1]]
+            position = delta_left_right
+        else:
+            position = 0
+
+        return position
+
+    def run(self):
+        r = rospy.Rate(self.publish_rate)
+        while not rospy.is_shutdown():
+            self.publish_cmd_vel()
+            self.publish_lateral_displacement()
+            r.sleep()
+
+    def _log(self, log_string):
+        log_string = '[' + self._node_name + '] ' + log_string
+        rospy.loginfo(log_string)
+
     def loop(self):
         rospy.spin()
 
@@ -256,3 +328,5 @@ if __name__ == '__main__':
                                    colour_error= colour_error_value,
                                    colour_cal=is_colour_cal)
         robot_mover.loop()
+
+        robot_mover.run()
